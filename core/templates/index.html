@@ -1,7 +1,315 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    html { scroll-behavior: smooth; }
 
+    .hero-section {
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        min-height: 85vh; text-align: center; padding: 20px;
+    }
+    .hero-title { font-size: 4rem; color: #0056b3; margin-bottom: 10px; letter-spacing: 1px; }
+    .hero-slogan { font-size: 1.3rem; color: #555; max-width: 650px; margin-bottom: 40px; line-height: 1.6; }
+    
+    .cta-btn {
+        background-color: #0056b3; color: white; padding: 15px 35px; font-size: 1.2rem;
+        text-decoration: none; border-radius: 8px; font-weight: bold;
+        transition: background 0.3s, transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .cta-btn:hover { background-color: #004494; transform: translateY(-3px); }
 
+    .scroll-down {
+        margin-top: 80px; font-size: 1.1rem; color: #888; text-decoration: none;
+        transition: color 0.3s; animation: bounce 2s infinite;
+    }
+    .scroll-down:hover { color: #0056b3; }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    .instruction-section {
+        min-height: 80vh; padding: 80px 20px; text-align: center; background-color: white; border-top: 1px solid #eaeaea;
+    }
+    .section-title { font-size: 2.5rem; color: #333; margin-bottom: 50px; }
+    .steps-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1000px; margin: 0 auto; }
+    .step-card {
+        background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        flex: 1; min-width: 250px; border-top: 4px solid #0056b3; transition: transform 0.3s;
+    }
+    .step-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .step-icon { font-size: 3.5rem; margin-bottom: 20px; }
+    .step-title { font-size: 1.3rem; color: #0056b3; margin-bottom: 15px; }
+    .step-desc { color: #666; line-height: 1.6; }
+
+    .dashboard-wrapper {
+        background-color: #f4f7f6;
+        min-height: calc(100vh - 62px);
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    .dashboard-container {
+        display: flex;
+        gap: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        height: calc(100vh - 122px);
+    }
+
+    .sidebar {
+        width: 340px; 
+        background-color: #ffffff; 
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        overflow-y: auto; 
+        display: flex; 
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .sidebar-header {
+        font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 20px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .match-item {
+        padding: 15px 20px; 
+        border-radius: 12px; 
+        margin-bottom: 10px;
+        cursor: pointer; 
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        background-color: transparent;
+    }
+    .match-item:hover { background-color: #f8f9fa; border-color: #eaeaea; }
+    
+    .match-item.active { 
+        background-color: #f0f7ff; 
+        border-color: #cce0ff;
+    }
+    
+    .match-title {
+        font-weight: 600; color: #1a1a1a; margin-bottom: 5px; font-size: 0.95rem;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .match-item.active .match-title { color: #0056b3; }
+    
+    .match-date { font-size: 0.8rem; color: #888; }
+
+    .main-panel {
+        flex: 1; 
+        background: white; 
+        border-radius: 16px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        padding: 40px 50px; 
+        overflow-y: auto; 
+        box-sizing: border-box;
+    }
+    
+    .detail-header { border-bottom: 1px solid #eaeaea; padding-bottom: 20px; margin-bottom: 25px; }
+    .detail-title { font-size: 1.8rem; color: #333; margin: 0 0 10px 0; }
+    .detail-link { 
+        color: #0056b3; font-size: 0.95rem; text-decoration: none; 
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .detail-link:hover { text-decoration: underline; }
+    
+    .detail-content { color: #444; line-height: 1.8; white-space: pre-wrap; font-size: 1.05rem; }
+    
+    .skill-tag {
+        display: inline-block; background: #f0f7ff; color: #0056b3; padding: 8px 16px;
+        border-radius: 20px; font-size: 0.85rem; margin: 5px 8px 10px 0; font-weight: 600;
+        border: 1px solid #cce0ff;
+    }
+
+    /* Floating Action Button (FAB) */
+    .fab-button {
+        position: fixed; bottom: 40px; right: 40px; background-color: #0056b3; color: white;
+        border: none; border-radius: 30px; padding: 15px 25px; font-size: 1rem; font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0, 86, 179, 0.4); cursor: pointer; display: flex; align-items: center;
+        gap: 10px; transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s; text-decoration: none; z-index: 1000;
+    }
+    .fab-button:hover { 
+        transform: translateY(-5px); 
+        background-color: #004494; 
+        box-shadow: 0 6px 20px rgba(0, 86, 179, 0.6);
+    }
+    .fab-icon { font-size: 1.5rem; line-height: 1; margin-top: -2px; }
+
+</style>
+
+{% if not user.is_authenticated %}
+    <div class="hero-section">
+        <h1 class="hero-title">Skill Match</h1>
+        <p class="hero-slogan">Your smart assistant to perfectly match your skills with your dream job requirements and generate a unique CV in seconds.</p>
+        <a href="{% url 'register' %}" class="cta-btn">Get Started Now</a>
+        <a href="#how-it-works" class="scroll-down">How it works? <br><span style="font-size: 2rem; display: block; margin-top: 5px;">↓</span></a>
+    </div>
+
+    <div id="how-it-works" class="instruction-section">
+        <h2 class="section-title">How it works?</h2>
+        <div class="steps-container">
+            <div class="step-card">
+                <div class="step-icon">👤</div>
+                <h3 class="step-title">1. Create a Profile</h3>
+                <p class="step-desc">Enter your core skills and past experiences once, and securely save them in our database.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">🔗</div>
+                <h3 class="step-title">2. Paste Job Link</h3>
+                <p class="step-desc">Provide the link to the job posting you want to apply for from any major job board.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon">✨</div>
+                <h3 class="step-title">3. Get Your Perfect CV</h3>
+                <p class="step-desc">Our system analyzes the job requirements and tailors your skills to generate the most suitable CV for you.</p>
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="dashboard-wrapper">
+        <div class="dashboard-container">
+            
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <span>Matches History</span>
+                </div>
+                
+                {% if matches %}
+                    {% for match in matches %}
+                        <div class="match-item {% if forloop.first %}active{% endif %}">
+                            <div class="match-title">{{ match.job_url }}</div>
+                            <div class="match-date">{{ match.created_at|date:"M d, Y, H:i" }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; color: #888; padding: 30px 10px; font-size: 0.95rem;">
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;">📄</div>
+                        You have no job matches yet. <br> Click "+ New Match" to start.
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="main-panel" {% if not matches %}style="display:flex; justify-content:center; align-items:center;"{% endif %}>
+                
+                {% if matches %}
+                    {% with first_match=matches.first %}
+                        <div class="detail-header">
+                            <h2 class="detail-title">Job Details</h2>
+                            <a href="{{ first_match.job_url }}" class="detail-link" target="_blank">🔗 View Original Job Posting</a>
+                        </div>
+                        
+                        <h4 style="color:#0056b3; margin-bottom: 15px; font-size: 1.1rem;">Missing Skills Added:</h4>
+                        <div style="margin-bottom: 35px;">
+                            {% if first_match.added_skills %}
+                                <span class="skill-tag">{{ first_match.added_skills }}</span>
+                            {% else %}
+                                <span style="color: #888; font-size: 0.9rem;">No extra skills added yet.</span>
+                            {% endif %}
+                        </div>
+
+                        <h4 style="color:#0056b3; margin-bottom: 15px; font-size: 1.1rem;">Generated CV Summary:</h4>
+                        <div class="detail-content">{% if first_match.final_cv_text %}{{ first_match.final_cv_text }}{% else %}CV content is not generated yet...{% endif %}</div>
+                    {% endwith %}
+                {% else %}
+                    <div style="text-align: center; color: #aaa;">
+                        <h2 style="color: #ccc; margin-bottom: 10px;">Select or Create a Match</h2>
+                        <p>Your generated CV details will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    <button onclick="openModal()" class="fab-button">
+        <span class="fab-icon">+</span>
+        New Match
+    </button>
+
+{% endif %}
+
+<style>
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 16px; width: 90%; max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative;
+            transform: translateY(-20px); opacity: 0; transition: all 0.3s ease;
+        }
+        .modal-overlay.show .modal-content { transform: translateY(0); opacity: 1; }
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #888; border: none; background: none;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-title { font-size: 1.5rem; color: #333; margin-bottom: 20px; margin-top: 0;}
+        
+        .form-label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
+        .form-input { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; font-family: inherit;}
+        .form-textarea { resize: vertical; min-height: 150px; }
+        
+        .btn-match {
+            background: linear-gradient(90deg, #0056b3 0%, #0080ff 100%); color: white; border: none;
+            padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1.1rem;
+            cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,86,179,0.3);
+        }
+        .btn-match:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,86,179,0.4); }
+        .divider-text { text-align: center; margin: 10px 0 20px 0; color: #888; font-size: 0.9rem; }
+        
+        #loading-spinner { display: none; text-align: center; margin-top: 15px; color: #0056b3; font-weight: bold;}
+    </style>
+
+    <div class="modal-overlay" id="matchModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 class="modal-title">✨ Create New CV Match</h2>
+            
+            <form method="POST" action="{% url 'home' %}" id="matchForm" onsubmit="showLoading()">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="new_match">
+                
+                <label class="form-label">Option 1: Job Posting URL</label>
+                <input type="url" name="job_url" class="form-input" placeholder="https://zangia.mn/job/...">
+                
+                <div class="divider-text">— OR —</div>
+                
+                <label class="form-label">Option 2: Paste Job Description</label>
+                <textarea name="job_text" class="form-input form-textarea" placeholder="Paste the requirements, responsibilities, and about the job here..."></textarea>
+                
+                <button type="submit" class="btn-match" id="matchBtn">🚀 Match!</button>
+                <div id="loading-spinner">🤖 AI is generating your perfect CV... Please wait (10-20s)</div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            const modal = document.getElementById('matchModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('matchModal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function showLoading() {
+            document.getElementById('matchBtn').style.display = 'none';
+            document.getElementById('loading-spinner').style.display = 'block';
+        }
+
+        document.getElementById('matchModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
 
 {% endblock %}

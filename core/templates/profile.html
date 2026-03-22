@@ -1,4 +1,221 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    .dashboard-wrapper {
+        background-color: #f4f7f6;
+        min-height: calc(100vh - 62px);
+        padding: 30px;
+        box-sizing: border-box;
+    }
+
+    .dashboard-container {
+        display: flex;
+        gap: 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        height: calc(100vh - 122px);
+    }
+
+    .sidebar {
+        width: 320px; 
+        background-color: #ffffff; 
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    .sidebar-header {
+        font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 20px;
+    }
+
+    .menu-item {
+        padding: 15px 20px; 
+        border-radius: 12px; 
+        margin-bottom: 10px;
+        cursor: pointer; 
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        font-weight: 600;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .menu-item:hover { background-color: #f8f9fa; border-color: #eaeaea; }
+    
+    .menu-item.active { 
+        background-color: #f0f7ff; 
+        border-color: #cce0ff;
+        color: #0056b3;
+    }
+
+    .main-panel {
+        flex: 1; 
+        background: white; 
+        border-radius: 16px; 
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        padding: 40px 50px; 
+        overflow-y: auto; 
+        box-sizing: border-box;
+    }
+    
+    .detail-title { font-size: 1.8rem; color: #333; margin: 0 0 10px 0; }
+    .detail-subtitle { color: #666; margin-bottom: 30px; font-size: 1.05rem; }
+
+    .form-group { margin-bottom: 25px; }
+    .form-label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
+    
+    .form-input { 
+        width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; 
+        font-size: 1rem; box-sizing: border-box; transition: all 0.3s; background-color: #fbfcfd;
+    }
+    .form-input:focus { 
+        border-color: #0056b3; outline: none; background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(0,86,179,0.1); 
+    }
+    
+    .form-textarea { resize: vertical; min-height: 250px; line-height: 1.6; }
+
+    .dynamic-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .btn-add { 
+        background: none; border: none; color: #0056b3; font-weight: bold; 
+        cursor: pointer; padding: 10px 0 0 0; font-size: 0.95rem; text-align: left; display: inline-block;
+    }
+    .btn-add:hover { text-decoration: underline; }
+
+    .action-buttons { 
+        display: flex; gap: 15px; margin-top: 40px; padding-top: 25px; border-top: 1px solid #eaeaea; 
+    }
+    .btn-save { 
+        background-color: #0056b3; color: white; border: none; padding: 12px 30px; 
+        border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; transition: 0.3s; 
+    }
+    .btn-save:hover { background-color: #004494; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,86,179,0.2); }
+    
+    .btn-cancel { 
+        background-color: #f1f1f1; color: #555; border: none; padding: 12px 25px; 
+        border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; transition: 0.3s; 
+    }
+    .btn-cancel:hover { background-color: #e2e2e2; }
+
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header">Profile Settings</div>
+            
+            <div class="menu-item active" onclick="switchTab('contact', this)">
+                <span>📞</span> Contact Data
+            </div>
+            
+            <div class="menu-item" onclick="switchTab('experience', this)">
+                <span>⭐</span> Experience & Skills
+            </div>
+        </div>
+
+        <div class="main-panel">
+            
+            <form id="tab-contact" action="#" method="POST">
+                {% csrf_token %}
+                <h2 class="detail-title">Contact Data</h2>
+                <p class="detail-subtitle">Manage your phone numbers, professional networks, and portfolio links.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Numbers</label>
+                    <div id="phone-container" class="dynamic-list">
+                        {% if profile.phone_numbers %}
+                            {% for phone in profile.phone_numbers %}
+                                <input type="text" name="phones[]" class="form-input" value="{{ phone }}" placeholder="e.g., +976 9900 0000">
+                            {% endfor %}
+                        {% else %}
+                            <input type="text" name="phones[]" class="form-input" placeholder="e.g., +976 9900 0000">
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add" onclick="addNewField('phone-container', 'phones[]', 'e.g., +976 8800 0000')">+ Add New Phone</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">LinkedIn URL</label>
+                    <input type="url" name="linkedin" class="form-input" value="{{ profile.linkedin_url|default:'' }}" placeholder="https://linkedin.com/in/yourusername">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">GitHub URL</label>
+                    <input type="url" name="github" class="form-input" value="{{ profile.github_url|default:'' }}" placeholder="https://github.com/yourusername">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Other Websites (Portfolio, Blog, etc.)</label>
+                    <div id="website-container" class="dynamic-list">
+                        {% if profile.other_websites %}
+                            {% for web in profile.other_websites %}
+                                <input type="url" name="websites[]" class="form-input" value="{{ web }}" placeholder="https://yourportfolio.com">
+                            {% endfor %}
+                        {% else %}
+                            <input type="url" name="websites[]" class="form-input" placeholder="https://yourportfolio.com">
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-add" onclick="addNewField('website-container', 'websites[]', 'https://...')">+ Add New Website</button>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn-save">Save Changes</button>
+                    <button type="reset" class="btn-cancel">Cancel changes</button>
+                </div>
+            </form>
+
+
+            <form id="tab-experience" action="#" method="POST" style="display: none;">
+                {% csrf_token %}
+                <h2 class="detail-title">Experience & Skills</h2>
+                <p class="detail-subtitle">Describe your professional background. The more details you provide, the better the AI can generate your CV.</p>
+                
+                <div class="form-group">
+                    <textarea name="base_skills" class="form-input form-textarea" placeholder="E.g., I have 3 years of experience...">{{ profile.base_skills|default:'' }}</textarea>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn-save">Save Changes</button>
+                    <button type="reset" class="btn-cancel">Cancel changes</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName, element) {
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => item.classList.remove('active'));
+        
+        element.classList.add('active');
+
+        document.getElementById('tab-contact').style.display = 'none';
+        document.getElementById('tab-experience').style.display = 'none';
+
+        document.getElementById('tab-' + tabName).style.display = 'block';
+    }
+
+    function addNewField(containerId, inputName, placeholderText) {
+        const container = document.getElementById(containerId);
+        
+        const input = document.createElement('input');
+        input.type = inputName.includes('website') ? 'url' : 'text';
+        input.name = inputName;
+        input.className = 'form-input';
+        input.placeholder = placeholderText;
+        
+        container.appendChild(input);
+        
+        input.focus();
+    }
+</script>
+
+
 {% endblock %}

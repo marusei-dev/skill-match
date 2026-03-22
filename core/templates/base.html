@@ -10,6 +10,13 @@
             padding: 0;
             background-color: #f4f7f6;
             color: #333;
+            
+            opacity: 0; 
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        body.page-loaded {
+            opacity: 1;
         }
 
         .top-bar {
@@ -86,6 +93,32 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add("page-loaded");
+        });
+
+        document.addEventListener("click", (e) => {
+            const link = e.target.closest("a");
+            
+            if (link && link.href) {
+                const destination = link.href;
+                const currentUrl = window.location.origin + window.location.pathname;
+
+                if (link.target === "_blank" || destination.includes("#")) {
+                    return;
+                }
+
+                e.preventDefault();
+                document.body.classList.remove("page-loaded");
+
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 400); 
+            }
+        });
+    </script>
 
 </body>
 </html>
