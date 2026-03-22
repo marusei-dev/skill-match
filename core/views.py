@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
@@ -5,14 +6,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login
 from django.contrib.auth.forms import UserCreationForm
-from .models import JobMatch, UserProfile
-import os
 from dotenv import load_dotenv
+from .models import JobMatch, UserProfile
 
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=GEMINI_API_KEY)
+
 
 def extract_text_from_url(url):
     try:
@@ -27,8 +28,9 @@ def extract_text_from_url(url):
         text = soup.get_text(separator=' ', strip=True)
         return text[:10000]
     except Exception as e:
-        return f"Cold not extract: {str(e)}"
-    
+        return f"Could not read the contents at the provided link: {str(e)}"
+
+
 def generate_cv_with_gemini(profile, job_description):
     model = genai.GenerativeModel('gemini-2.5-flash')
 
@@ -37,13 +39,15 @@ def generate_cv_with_gemini(profile, job_description):
     Phone Numbers: {profile.phone_numbers}
     LinkedIn: {profile.linkedin_url}
     GitHub: {profile.github_url}
-    Other websites: {profile.other_websites}
+    Other Websites: {profile.other_websites}
     """
 
     prompt = f"""
     You are an expert ATS-friendly CV writer.
     I will provide a User's Profile data and a Job Description.
-    Your task is to match the user's experience with the job requirements and generate a highly tailored CV, however, you should not come up with too unrealistic experience that is too different from the user's.
+    Your task is to match the user's experience with the job requirements and
+    generate a highly tailored CV, however, you should not come up with too
+    unrealistic experience that is too different from the user's.
 
     User Profile:
     {user_info}
@@ -51,30 +55,36 @@ def generate_cv_with_gemini(profile, job_description):
     Job Description:
     {job_description}
 
-    CRITICAL INSTRUCTION: You must output the CV scrictly in the following format. Do not add any introductory or concluding conversational text. Just output the CV content.
-    
+    CRITICAL INSTRUCTION: You must output the CV scrictly in the following format.
+    Do not add any introductory or concluding conversational text.
+    Just output the CV content.
+
     SUMMARY
-    [Write a compelling 2-3 sentence summary tailored to the job, highlighting key metrics if available]
+    [Write a compelling 2-3 sentence summary tailored to the job, highlighting
+    key metrics if available]
 
     WORK EXPERIENCE
-    [Heavily rely on the experience provided by the user, only changing it if it could be realistic, do not diverge too far from the user's experience]
+    [Heavily rely on the experience provided by the user, only changing it if it
+    could be realistic, do not diverge too far from the user's experience]
 
     PROJECTS
-    [Heavily rely on the projects already provided by the user. Change information only if it is very realistic and close to what the user did.]
+    [Heavily rely on the projects already provided by the user. Change information
+    only if it is very realistic and close to what the user did.]
 
     SKILLS
-    [Here feel free to add relevant experience from the user's (priority) and then add up what the job description requires.]
+    [Here feel free to add relevant experience from the user's (priority) and
+    then add up what the job description requires.]
 
     LANGUAGES
     [Copy from the user, if available]
-
     """
 
     try:
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"There was an error when generating the CV: {str(e)}"
+        return f"There was an error during CV generation: {str(e)}"
+
 
 def home(request):
     if request.user.is_authenticated:
@@ -89,9 +99,9 @@ def home(request):
                 final_job_description = extract_text_from_url(job_url)
 
             profile, created = UserProfile.objects.get_or_create(user=request.user)
-            
+
             generated_cv = generate_cv_with_gemini(profile, final_job_description)
-            
+
             title_url = job_url if job_url else "Manual Text Input"
             JobMatch.objects.create(
                 user=request.user,
@@ -99,12 +109,12 @@ def home(request):
                 final_cv_text=generated_cv,
                 added_skills="AI Analyzed"
             )
-            
+
             return redirect('home')
 
         matches = JobMatch.objects.filter(user=request.user).order_by('-created_at')
         return render(request, 'index.html', {'matches': matches})
-    
+
     return render(request, 'index.html')
 
 
