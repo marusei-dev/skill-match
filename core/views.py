@@ -110,6 +110,11 @@ def home(request):
                 added_skills="AI Analyzed"
             )
 
+            matches = JobMatch.objects.filter(user=request.user).order_by('-created_at')
+
+            if request.headers.get('HX-Request'):
+                return render(request, 'partials/dashboard.html', {'matches': matches})
+
             return redirect('home')
 
         matches = JobMatch.objects.filter(user=request.user).order_by('-created_at')
