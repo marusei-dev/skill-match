@@ -1,58 +1,10 @@
 {% extends 'base.html' %}
 
 {% load socialaccount %} {% block content %}
-<style>
-    .content-box {
-        background-color: white;
-        max-width: 400px; 
-        margin: 60px auto;
-        padding: 30px 40px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        text-align: center;
-    }
-
-    input[type="text"], input[type="password"] {
-        width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 20px;
-        border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
-    }
-
-    .submit-btn {
-        background-color: #0056b3; color: white; border: none; padding: 12px 20px;
-        font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold;
-        margin-bottom: 15px; transition: background 0.3s;
-    }
-    .submit-btn:hover { background-color: #004494; }
-
-    .google-btn {
-        background-color: #db4437; color: white; border: none; padding: 12px 20px;
-        font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold;
-        display: block; text-decoration: none; margin-bottom: 20px; transition: background 0.3s;
-        box-sizing: border-box;
-    }
-    .google-btn:hover { background-color: #c23321; }
-
-    .divider {
-        margin: 20px 0; color: #888; font-size: 14px; position: relative;
-    }
-    .divider::before, .divider::after {
-        content: ""; position: absolute; top: 50%; width: 40%; height: 1px; background-color: #ddd;
-    }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
-
-    .register-link { color: #0056b3; text-decoration: none; font-weight: bold; }
-    .register-link:hover { text-decoration: underline; }
-
-    .error-msg {
-        color: #d9534f; font-size: 14px; margin-bottom: 15px; background-color: #f9f2f2;
-        padding: 10px; border-radius: 4px;
-    }
-</style>
 
 <div class="content-box">
-    <h2 style="color: #0056b3; margin-top: 0;">Welcome Back</h2>
-    <p style="color: #666; margin-bottom: 25px;">Please login to your account</p>
+    <h2 class="text-brand auth-form-header">Welcome Back</h2>
+    <p class="auth-subtitle">Please login to your account</p>
 
     {% if form.errors %}
         <div class="error-msg">Invalid username or password. Please try again.</div>

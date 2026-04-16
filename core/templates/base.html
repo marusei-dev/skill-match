@@ -3,67 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Skill Match</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7f6;
-            color: #333;
-        }
-
-        .top-bar {
-            background: linear-gradient(90deg, #0056b3 0%, #0080ff 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .top-bar .logo { font-size: 24px; font-weight: bold; }
-        
-        .top-bar a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .top-bar a:hover { background: rgba(255, 255, 255, 0.2); }
-
-        .google-btn-custom {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fff;
-            color: #3c4043;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            font-family: 'Roboto', 'Segoe UI', sans-serif;
-            text-decoration: none;
-            width: 100%;
-            box-sizing: border-box;
-            transition: background-color 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        .google-btn-custom:hover {
-            background-color: #f8f9fa;
-            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
-        }
-        .google-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
 </head>
 <body hx-boost="true">
